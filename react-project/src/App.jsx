@@ -8,14 +8,14 @@ import ProfileCard from './components/ProfileCard'
 function App() {
 
   const profile = { 
-    name : "황동준",
-    age : 26,
+    name : "슬픈 고양이",
+    age : 3,
     isOnline : true,
   }
 
   const offlineProfile = {
-    name : "황동욱",
-    age : 31,
+    name : "빡친 고양이",
+    age : 2,
     isOnline : false,
   }
 
@@ -23,7 +23,6 @@ function App() {
     <>
       <ProfileCard profile = {profile}/>
       <ProfileCard profile = {offlineProfile}/>
-
     </>
   )
 }
