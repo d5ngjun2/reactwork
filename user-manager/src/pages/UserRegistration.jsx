@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { redirect } from 'react-router-dom'
 import styled from 'styled-components'
 
 const Background = styled.div`
@@ -88,6 +89,7 @@ const UserRegistration = ({ setUserList }) => {
     }
 
     alert(`${name}님 성공적으로 등록 완료되었습니다.`);
+
     setUserList(prevUsers => [...prevUsers, newUser]); // 부모에서 받은 setUserList로 업데이트
   }
 
