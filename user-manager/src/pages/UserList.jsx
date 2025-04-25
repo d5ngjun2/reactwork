@@ -86,14 +86,14 @@ const Background = styled.div`
 // 유저 목록 페이지
 const UserList = ({ user }) => {
 
-    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectUser, setSelectUser] = useState(null);
 
     const openModal = (user) => {
-        setSelectedUser(user);
+        setSelectUser(user);
     };
 
     const closeModal = () => {
-        setSelectedUser(null);
+        setSelectUser(null);
     };
 
     return (
@@ -111,16 +111,16 @@ const UserList = ({ user }) => {
                 )
             })}
 
-            {/* 모달 창 */}
-            {selectedUser && (
+           
+            {selectUser && (
                 <ModalOverlay onClick={closeModal}>
                     <ModalContent onClick={(e) => e.stopPropagation()}>
                         <CloseBtn onClick={closeModal}>&times;</CloseBtn>
-                        <h2>{selectedUser.name}님의 정보</h2>
-                        <p><strong>나이:</strong> {selectedUser.age}</p>
-                        <p><strong>직업:</strong> {selectedUser.job}</p>
-                        <p><strong>이메일:</strong> {selectedUser.email}</p>
-                        <p><strong>성별:</strong> {selectedUser.gender}</p>
+                        <h2>{selectUser.name}님의 정보</h2>
+                        <p><strong>나이:</strong> {selectUser.age}</p>
+                        <p><strong>직업:</strong> {selectUser.job}</p>
+                        <p><strong>이메일:</strong> {selectUser.email}</p>
+                        <p><strong>성별:</strong> {selectUser.gender}</p>
                     </ModalContent>
                 </ModalOverlay>
             )}

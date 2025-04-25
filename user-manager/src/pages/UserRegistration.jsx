@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { redirect } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 
 const Background = styled.div`
@@ -93,6 +93,12 @@ const UserRegistration = ({ setUserList }) => {
     setUserList(prevUsers => [...prevUsers, newUser]); // 부모에서 받은 setUserList로 업데이트
   }
 
+  const navigate = useNavigate();
+
+  const backToList = () => {
+    navigate("/UserList");
+  }
+
   return (
     <Background>
       <Title>유저 등록</Title>
@@ -112,7 +118,8 @@ const UserRegistration = ({ setUserList }) => {
         <InputText type="text" placeholder='성별 입력'
           value={gender}
           onChange={(ev) => setGender(ev.target.value)} />
-        <SubmitBtn type='submit'>등록</SubmitBtn>
+
+        <SubmitBtn type='submit' onClick={backToList}>등록</SubmitBtn>
       </StyledForm>
     </Background>
   )

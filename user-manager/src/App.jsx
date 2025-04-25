@@ -13,7 +13,7 @@ function App() {
     <BrowserRouter>
       <Header />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home user = {userList}/>} />
         <Route path="/UserList" element={<UserList user={userList} />} /> 
         <Route path="/UserRegistration" element={<UserRegistration setUserList={setUserList} />} /> 
         <Route path='*' element={<NotFound />}/>
