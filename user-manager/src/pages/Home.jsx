@@ -87,8 +87,12 @@ const Home = ({ user }) => {
 
   return (
     <Mainpage>
-      <Title>메인 페이지에 오신 것을 환영합니다.</Title>
-      <Subtitle>유저를 등록하거나 유저 목록을 확인해보세요.</Subtitle>
+      <Title>유저관리 페이지에 오신 것을 환영합니다.</Title>
+      <Subtitle>
+        유저를 새롭게 등록하거나 유저 목록을 확인해보세요! <br />
+        유저 정보가 없다면 바로 등록해보세요!
+      </Subtitle>
+
 
       <SummaryContainer>
         <SummaryCard>

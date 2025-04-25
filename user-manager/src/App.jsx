@@ -14,7 +14,7 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Home user = {userList}/>} />
-        <Route path="/UserList" element={<UserList user={userList} />} /> 
+        <Route path="/UserList" element={<UserList user={userList} setUser={setUserList} />} /> 
         <Route path="/UserRegistration" element={<UserRegistration setUserList={setUserList} />} /> 
         <Route path='*' element={<NotFound />}/>
       </Routes>
