@@ -8,6 +8,7 @@ import UserRegistration from './pages/UserRegistration';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Video from './pages/Video';
+import MyPage from './pages/MyPage';
 
 function App() {
   return (
@@ -20,11 +21,12 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<UserRegistration />} />
           <Route path="/video" element={<Video />} />
+          <Route path="/mypage" element={<MyPage />} />
           {/* 
           <Route path="/signup" element={<SignUp />} />
           <Route path="*" element={<NotFound />} /> */}
         </Routes>
-        <ToastContainer position="top-right" autoClose={1500} />
+        <ToastContainer position="top-right" autoClose={3000} />
       </BrowserRouter>
     </>
   );

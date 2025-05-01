@@ -5,12 +5,15 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { MdOutlineSportsSoccer } from 'react-icons/md';
 import { Link } from 'react-router-dom';
+import useUserStore from '../components/store/useUserStore';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 // Yup schema 정의
 const schema = yup.object({
   username: yup.string().required('아이디는 필수입니다.'),
   password: yup.string().required('비밀번호는 필수입니다.'),
-  email: yup.string().email('올바른 이메일 주소를 입력하세요.').required('이메일은 필수입니다.'),
 });
 
 const MainContainer = styled.div`
@@ -124,6 +127,8 @@ const ErrorMessage = styled.p`
 `;
 
 const Login = () => {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -132,8 +137,30 @@ const Login = () => {
     resolver: yupResolver(schema), // yup 유효성 검사 적용
   });
 
-  const onSubmit = (data) => {
-    console.log(data); // 폼 제출 시 데이터 처리
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/users?username=${data.username}&password=${data.password}`
+      );
+
+      // 서버에서 받은 데이터가 없거나 빈 배열이라면 로그인 실패
+      if (response.data.length === 0) {
+        toast.error('아이디 또는 비밀번호가 잘못되었습니다.');
+        return;
+      }
+
+      const userData = response.data[0]; // 유효한 사용자 정보
+      console.log('로그인 성공 ! ', userData); // 서버로부터 응답 데이터 출력
+      toast.success('로그인 성공!');
+
+      // 로그인 후 상태 업데이트
+      useUserStore.getState().setUser(userData);
+
+      navigate('/');
+    } catch (error) {
+      console.error('로그인 요청 중 오류 발생:', error);
+      toast.error('로그인 요청 중 오류가 발생했습니다.');
+    }
   };
 
   return (

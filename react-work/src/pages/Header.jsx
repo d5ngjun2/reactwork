@@ -2,10 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import { MdOutlineSportsSoccer } from 'react-icons/md';
 import { Link } from 'react-router-dom';
-import { RiLoginBoxLine } from 'react-icons/ri';
 import { FaClipboardList } from 'react-icons/fa';
 import { MdOutlineOndemandVideo } from 'react-icons/md';
 import { FaUserPlus } from 'react-icons/fa';
+import useUserStore from '../components/store/useUserStore';
+import { MdOutlineLogout } from 'react-icons/md';
 
 const HeaderWrapper = styled.div`
   width: 100%;
@@ -47,7 +48,20 @@ const Nav = styled.nav`
   }
 `;
 
+const LogoutBtn = styled.p`
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: opacity 0.2s ease-in-out;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
 const Header = () => {
+  const { user, logout } = useUserStore();
   return (
     <HeaderWrapper>
       <Logo>
@@ -64,10 +78,30 @@ const Header = () => {
           <MdOutlineOndemandVideo />
           하이라이트
         </Link>
-        <Link to="/login">
-          <FaUserPlus />
-          로그인/회원가입
-        </Link>
+        {user ? (
+          // 로그인 상태일 때 "마이페이지"로 링크 변경
+          <Link to="/mypage">
+            <FaUserPlus />
+            마이페이지
+          </Link>
+        ) : (
+          // 로그인 안되어 있으면 "로그인/회원가입" 링크 표시
+          <Link to="/login">
+            <FaUserPlus />
+            로그인/회원가입
+          </Link>
+        )}
+        {user && (
+          // 로그아웃 버튼 추가
+          <LogoutBtn
+            onClick={() => {
+              logout();
+            }}
+          >
+            <MdOutlineLogout />
+            로그아웃
+          </LogoutBtn>
+        )}
       </Nav>
     </HeaderWrapper>
   );

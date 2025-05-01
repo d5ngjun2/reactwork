@@ -1,0 +1,36 @@
+{
+  "users": [
+    {
+      "id": "ae2f",
+      "age": 23,
+      "email": "asd@asd",
+      "name": "sad",
+      "password": "sad",
+      "username": "ㅁㄴㅇ"
+    },
+    {
+      "id": "e641",
+      "age": 23,
+      "email": "nikihwangg@naver.com",
+      "name": "dongjun",
+      "password": "niki4520",
+      "username": "msh2nd"
+    },
+    {
+      "id": "fafa",
+      "age": 23,
+      "email": "sad@asd",
+      "name": "sad",
+      "password": "sad",
+      "username": "sad"
+    },
+    {
+      "id": "464d",
+      "age": 23,
+      "email": "nikihwangg@naver.com",
+      "name": "nikihwangg",
+      "password": "niki4520",
+      "username": "nikihwangg"
+    }
+  ]
+}
