@@ -88,7 +88,7 @@ const Board = () => {
   // 마운트시 게시글 전부 가져오기
   useEffect(() => {
     allBoards();
-  });
+  }, []);
 
   const ClickBoard = (boardId) => {
     navigate(`/BoardDetail/${boardId}`);

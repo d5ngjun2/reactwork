@@ -1,8 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
 import useBoardStore from '../components/store/useBoardStore';
 import useUserStore from '../components/store/useUserStore';
+import { toast } from 'react-toastify';
+import { useEffect } from 'react';
 
 const MainContainer = styled.div`
   width: 100%;
@@ -85,14 +87,6 @@ const TextArea = styled.textarea`
   }
 `;
 
-const FileInput = styled.input`
-  border: none;
-  background: white;
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 15px;
-`;
-
 const ButtonGroup = styled.div`
   display: flex;
   gap: 1rem;
@@ -123,18 +117,43 @@ const ActionButton = styled.button`
   }
 `;
 
+const DeleteButton = styled(ActionButton)`
+  background-color: #ff0000;
+
+  &:hover {
+    background-color: #e20000;
+  }
+`;
+
 const BoardDetail = () => {
   const { boardId } = useParams(); // URL에서 boardId를 가져옴
-  const user = useUserStore((loginUser) => loginUser.user);
-  const boardList = useBoardStore((state) => state.boards);
+  const user = useUserStore((loginUser) => loginUser.user); // 로그인 한 사람의 정보
+  const boards = useBoardStore((state) => state.boards);
+  const { deleteBoard, updateBoard } = useBoardStore();
 
   const navigate = useNavigate();
 
-  const board = boardList.find((board) => board.id.toString() === boardId);
+  const board = boards.find((board) => board.id.toString() === boardId);
 
-  if (!board) {
-    return <div>게시글을 찾을 수 없습니다.</div>;
-  }
+  const handleDelete = async () => {
+    if (window.confirm('정말 삭제하시겠습니까?')) {
+      try {
+        await deleteBoard(board.id); // 게시글 삭제 요청
+        toast.success('게시글이 삭제되었습니다.');
+        navigate('/board', { replace: true }); // 게시글 삭제 후 /board로 이동
+      } catch (error) {
+        toast.error('게시글 삭제에 실패했습니다.');
+        console.error('게시글 삭제 실패:', error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    // 페이지 들어왔을 때 조회수 1 증가
+    if (board) {
+      updateBoard(board.id, { views: (board.views || 0) + 1 });
+    }
+  }, []);
 
   return (
     <MainContainer>
@@ -165,6 +184,14 @@ const BoardDetail = () => {
           <ActionButton type="button" onClick={() => navigate('/board')}>
             돌아가기
           </ActionButton>
+          {user?.name === board.writer && (
+            <>
+              <ActionButton onClick={() => navigate(`/edit-board/${board.id}`)}>수정</ActionButton>
+              <DeleteButton type="button" onClick={handleDelete}>
+                삭제
+              </DeleteButton>
+            </>
+          )}
         </ButtonGroup>
       </EnrollForm>
     </MainContainer>

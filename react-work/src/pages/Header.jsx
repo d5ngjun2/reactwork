@@ -7,6 +7,7 @@ import { MdOutlineOndemandVideo } from 'react-icons/md';
 import { FaUserPlus } from 'react-icons/fa';
 import useUserStore from '../components/store/useUserStore';
 import { MdOutlineLogout } from 'react-icons/md';
+import { toast } from 'react-toastify';
 
 const HeaderWrapper = styled.div`
   width: 100%;
@@ -67,6 +68,7 @@ const Header = () => {
       <Logo>
         오늘의 축구 <MdOutlineSportsSoccer />
       </Logo>
+
       <Nav>
         <Link to="/">
           <FaClipboardList /> HOME
@@ -96,6 +98,7 @@ const Header = () => {
           <LogoutBtn
             onClick={() => {
               logout();
+              toast.error('로그아웃 되었습니다.');
             }}
           >
             <MdOutlineLogout />

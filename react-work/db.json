@@ -9,28 +9,12 @@
       "username": "ㅁㄴㅇ"
     },
     {
-      "id": "e641",
-      "age": 23,
-      "email": "nikihwangg@naver.com",
-      "name": "dongjun",
-      "password": "niki4520",
-      "username": "msh2nd"
-    },
-    {
       "id": "fafa",
       "age": 23,
       "email": "sad@asd",
       "name": "sad",
       "password": "sad",
       "username": "sad"
-    },
-    {
-      "id": "464d",
-      "age": 23,
-      "email": "nikihwangg@naver.com",
-      "name": "nikihwangg",
-      "password": "niki4520",
-      "username": "nikihwangg"
     },
     {
       "id": "34dd",
@@ -47,6 +31,22 @@
       "name": "ㅇㅇ",
       "password": "pass01",
       "username": "user01"
+    },
+    {
+      "id": "1b55",
+      "age": "26",
+      "email": "nikihwangg@naver.com",
+      "name": "황동준",
+      "password": "niki4520",
+      "username": "nikihwangg"
+    },
+    {
+      "id": "625f",
+      "age": 26,
+      "email": "nikihwangg@naver.com",
+      "name": "황동준",
+      "password": "niki4520",
+      "username": "nikihwangg"
     }
   ],
   "boards": [
@@ -129,6 +129,26 @@
       "content": "파리 생제르맹 소속 이강인이 리그 경기에서 첫 골을 기록하며 팀에 중요한 승리를 안겼습니다.",
       "date": "2025-04-22",
       "views": 270
+    },
+    {
+      "id": "43b9",
+      "title": "ㅇ",
+      "sysdate": "2025-05-02",
+      "writer": "황동준",
+      "content": "ㅇ",
+      "file": "",
+      "date": "2025-05-02",
+      "views": 18
+    },
+    {
+      "id": "ef4d",
+      "title": "ㅇ",
+      "sysdate": "2025-05-02",
+      "writer": "황동준",
+      "content": "ㅇ",
+      "file": "",
+      "date": "2025-05-02",
+      "views": 2
     }
   ]
 }

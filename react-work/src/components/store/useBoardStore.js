@@ -43,15 +43,14 @@ const useBoardStore = create((set, get) => ({
     }
   },
 
-  // 게시글 삭제
+  // useBoardStore.js
   deleteBoard: async (id) => {
     try {
       await axios.delete(`http://localhost:3001/boards/${id}`);
-      set((state) => ({
-        boards: state.boards.filter((b) => b.id !== id),
-      }));
+      return true;
     } catch (err) {
       console.error('게시글 삭제 실패:', err);
+      return false;
     }
   },
 }));

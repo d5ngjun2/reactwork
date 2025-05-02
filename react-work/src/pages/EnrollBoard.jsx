@@ -4,6 +4,7 @@ import useUserStore from '../components/store/useUserStore';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import useBoardStore from '../components/store/useBoardStore';
+import { toast } from 'react-toastify';
 
 const MainContainer = styled.div`
   width: 100%;
@@ -124,6 +125,29 @@ const ActionButton = styled.button`
   }
 `;
 
+const BackButton = styled.button`
+  padding: 12px 24px;
+  background-color: #0f62fe;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #0053d6;
+  }
+
+  &:nth-child(2) {
+    background-color: #aaa;
+
+    &:hover {
+      background-color: #888;
+    }
+  }
+`;
+
 const EnrollBoard = () => {
   const sysdate = new Date().toISOString().split('T')[0];
   const user = useUserStore((loginUser) => loginUser.user);
@@ -143,6 +167,7 @@ const EnrollBoard = () => {
     try {
       await addBoard(data);
       console.log('게시글 입력 성공!', data);
+      toast.success('게시글이 작성되었습니다.');
       navigate('/board');
     } catch (err) {
       console.log('등록 실패 : ', err);
@@ -181,7 +206,9 @@ const EnrollBoard = () => {
 
         <ButtonGroup>
           <ActionButton type="submit">작성</ActionButton>
-          <ActionButton onClick={() => navigate('/board')}>돌아가기</ActionButton>
+          <BackButton type="button" onClick={() => navigate('/board')}>
+            돌아가기
+          </BackButton>
         </ButtonGroup>
       </EnrollForm>
     </MainContainer>
