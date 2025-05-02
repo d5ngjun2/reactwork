@@ -9,6 +9,8 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Video from './pages/Video';
 import MyPage from './pages/MyPage';
+import EnrollBoard from './pages/EnrollBoard';
+import BoardDetail from './pages/BoardDetail';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           <Route path="/signup" element={<UserRegistration />} />
           <Route path="/video" element={<Video />} />
           <Route path="/mypage" element={<MyPage />} />
+          <Route path="/EnrollBoard" element={<EnrollBoard />} />
+          <Route path="/BoardDetail/:boardId" element={<BoardDetail />} />
           {/* 
           <Route path="/signup" element={<SignUp />} />
           <Route path="*" element={<NotFound />} /> */}

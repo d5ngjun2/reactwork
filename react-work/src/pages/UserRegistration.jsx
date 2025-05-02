@@ -127,7 +127,7 @@ const UserRegistration = () => {
       const response = await axios.post('http://localhost:3001/users', data);
       setUser(response.data);
       console.log('서버에 넘어간 회원가입 정보 : ', response.data);
-      toast.success('회원가입이 정상적으로 되었습니다. 로그인 해주세요.');
+      toast.success('회원가입이 정상적으로 되었습니다.');
       navigate('/');
     } catch (error) {
       console.error('회원가입 실패', error.message);

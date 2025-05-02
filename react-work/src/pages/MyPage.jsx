@@ -55,7 +55,7 @@ const UpdateButton = styled.button`
 `;
 
 const MyPage = () => {
-  const { user, logout } = useUserStore(); // 상태에서 user와 logout 함수 불러오기
+  const { user } = useUserStore(); // 상태에서 user와 logout 함수 불러오기
 
   if (!user) {
     return <div>로그인 후 마이페이지를 이용할 수 있습니다.</div>;
@@ -73,22 +73,6 @@ const MyPage = () => {
         </ProfileDetails>
         <UpdateButton onClick={() => alert('프로필 수정 페이지로 이동')}>프로필 수정</UpdateButton>
       </ProfileSection>
-
-      <button
-        onClick={logout}
-        style={{
-          padding: '0.8rem 2rem',
-          background: '#f44336',
-          color: 'white',
-          border: 'none',
-          borderRadius: '6px',
-          fontSize: '1rem',
-          cursor: 'pointer',
-          transition: 'background 0.3s ease',
-        }}
-      >
-        로그아웃
-      </button>
     </MyPageWrapper>
   );
 };

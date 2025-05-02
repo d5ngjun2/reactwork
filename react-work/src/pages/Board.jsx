@@ -1,5 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
+import useUserStore from '../components/store/useUserStore';
+import { Link } from 'react-router-dom';
+import useBoardStore from '../components/store/useBoardStore';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const MainContainer = styled.div`
   width: 100%;
@@ -57,7 +62,38 @@ const Card = styled.table`
   }
 `;
 
+const UpdateButton = styled(Link)`
+  padding: 0.8rem 2rem;
+  background: #78a812;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 1.5rem;
+  transition: background 0.3s ease;
+
+  &:hover {
+    background: #66a106;
+  }
+`;
 const Board = () => {
+  // 로그인 정보만 가져오기
+  const user = useUserStore((loginUser) => loginUser.user);
+
+  const boardList = useBoardStore((board) => board.boards);
+  const allBoards = useBoardStore((state) => state.SelectAllBoards);
+  const navigate = useNavigate();
+
+  // 마운트시 게시글 전부 가져오기
+  useEffect(() => {
+    allBoards();
+  });
+
+  const ClickBoard = (boardId) => {
+    navigate(`/BoardDetail/${boardId}`);
+  };
+
   return (
     <MainContainer>
       <Container>
@@ -72,30 +108,19 @@ const Board = () => {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td>1</td>
-              <td>황동준</td>
-              <td>임시 제목</td>
-              <td>2025.05.01</td>
-              <td>30</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>황동준</td>
-              <td>임시 제목</td>
-              <td>2025.05.01</td>
-              <td>30</td>
-            </tr>
-            <tr>
-              <td>1</td>
-              <td>황동준</td>
-              <td>임시 제목</td>
-              <td>2025.05.01</td>
-              <td>30</td>
-            </tr>
+            {boardList.map((board, index) => (
+              <tr key={index} onClick={() => ClickBoard(board.id)}>
+                <td>{index + 1}</td>
+                <td>{board.writer}</td>
+                <td>{board.title}</td>
+                <td>{board.date}</td>
+                <td>{board.views ?? 0}</td>
+              </tr>
+            ))}
           </tbody>
         </Card>
       </Container>
+      {user && <UpdateButton to="/EnrollBoard">게시글 작성</UpdateButton>}
     </MainContainer>
   );
 };
