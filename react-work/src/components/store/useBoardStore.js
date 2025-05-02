@@ -43,7 +43,6 @@ const useBoardStore = create((set, get) => ({
     }
   },
 
-  // useBoardStore.js
   deleteBoard: async (id) => {
     try {
       await axios.delete(`http://localhost:3001/boards/${id}`);
