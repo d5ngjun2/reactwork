@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
 import useBoardStore from '../components/store/useBoardStore';
 import useUserStore from '../components/store/useUserStore';
 import { toast } from 'react-toastify';
-import { useEffect } from 'react';
 
+// Styled components
 const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
@@ -126,21 +126,43 @@ const DeleteButton = styled(ActionButton)`
 `;
 
 const BoardDetail = () => {
-  const { boardId } = useParams(); // URL에서 boardId를 가져옴
-  const user = useUserStore((loginUser) => loginUser.user); // 로그인 한 사람의 정보
+  const { boardId } = useParams();
+  const user = useUserStore((state) => state.user);
   const boards = useBoardStore((state) => state.boards);
   const { deleteBoard, updateBoard } = useBoardStore();
-
+  const [boardDetails, setBoardDetails] = useState(null);
   const navigate = useNavigate();
+  const hasIncreasedView = useRef(false); // 조회수 중복 증가 방지
 
-  const board = boards.find((board) => board.id === boardId);
+  // 게시글 불러오기
+  useEffect(() => {
+    const currentBoard = boards.find((board) => board.id === boardId);
+    if (currentBoard) {
+      setBoardDetails(currentBoard);
+    }
+  }, [boards, boardId]);
 
+  // 조회수 증가
+  useEffect(() => {
+    if (boardDetails && !hasIncreasedView.current) {
+      hasIncreasedView.current = true;
+      updateBoard(boardDetails.id, {
+        views: (boardDetails.views || 0) + 1,
+      });
+      setBoardDetails((prev) => ({
+        ...prev,
+        views: (prev.views || 0) + 1,
+      }));
+    }
+  }, [boardDetails, updateBoard]);
+
+  // 삭제 처리
   const handleDelete = async () => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
       try {
-        await deleteBoard(board.id); // 게시글 삭제 요청
+        await deleteBoard(boardDetails.id);
         toast.success('게시글이 삭제되었습니다.');
-        navigate('/board', { replace: true }); // 게시글 삭제 후 /board로 이동
+        navigate('/board', { replace: true });
       } catch (error) {
         toast.error('게시글 삭제에 실패했습니다.');
         console.error('게시글 삭제 실패:', error);
@@ -148,12 +170,7 @@ const BoardDetail = () => {
     }
   };
 
-  useEffect(() => {
-    // 페이지 들어왔을 때 조회수 1 증가
-    if (board) {
-      updateBoard(board.id, { views: (board.views || 0) + 1 });
-    }
-  }, [board]);
+  if (!boardDetails) return <div>게시글을 찾을 수 없습니다.</div>;
 
   return (
     <MainContainer>
@@ -162,31 +179,31 @@ const BoardDetail = () => {
 
         <FormGroup>
           <Label>제목</Label>
-          <InputTitle type="text" value={board.title} readOnly />
+          <InputTitle type="text" value={boardDetails.title} readOnly />
         </FormGroup>
 
         <FormGroup>
           <Label>날짜</Label>
-          <InputTitle type="text" value={board.date} readOnly />
+          <InputTitle type="text" value={boardDetails.date} readOnly />
         </FormGroup>
 
         <FormGroup>
           <Label>작성자</Label>
-          <InputTitle type="text" value={board.writer} readOnly />
+          <InputTitle type="text" value={boardDetails.writer} readOnly />
         </FormGroup>
 
         <FormGroup>
           <Label>내용</Label>
-          <TextArea value={board.content} readOnly />
+          <TextArea value={boardDetails.content} readOnly />
         </FormGroup>
 
         <ButtonGroup>
           <ActionButton type="button" onClick={() => navigate('/board')}>
             돌아가기
           </ActionButton>
-          {user?.name === board.writer && (
+          {user?.name === boardDetails.writer && (
             <>
-              <ActionButton onClick={() => navigate(`/boardedit/${board.id}`)}>수정</ActionButton>
+              <ActionButton onClick={() => navigate(`/boardedit/${boardDetails.id}`)}>수정</ActionButton>
               <DeleteButton type="button" onClick={handleDelete}>
                 삭제
               </DeleteButton>
