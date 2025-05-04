@@ -133,7 +133,7 @@ const BoardDetail = () => {
 
   const navigate = useNavigate();
 
-  const board = boards.find((board) => board.id.toString() === boardId);
+  const board = boards.find((board) => board.id === boardId);
 
   const handleDelete = async () => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
@@ -153,7 +153,7 @@ const BoardDetail = () => {
     if (board) {
       updateBoard(board.id, { views: (board.views || 0) + 1 });
     }
-  }, []);
+  }, [board]);
 
   return (
     <MainContainer>
@@ -186,7 +186,7 @@ const BoardDetail = () => {
           </ActionButton>
           {user?.name === board.writer && (
             <>
-              <ActionButton onClick={() => navigate(`/edit-board/${board.id}`)}>수정</ActionButton>
+              <ActionButton onClick={() => navigate(`/boardedit/${board.id}`)}>수정</ActionButton>
               <DeleteButton type="button" onClick={handleDelete}>
                 삭제
               </DeleteButton>

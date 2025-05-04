@@ -12,6 +12,7 @@ import MyPage from './pages/MyPage';
 import EnrollBoard from './pages/EnrollBoard';
 import BoardDetail from './pages/BoardDetail';
 import NotFound from './pages/NotFound';
+import BoardEdit from './pages/BoardEdit';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/EnrollBoard" element={<EnrollBoard />} />
           <Route path="/BoardDetail/:boardId" element={<BoardDetail />} />
+          <Route path="/boardedit/:boardId" element={<BoardEdit />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         <ToastContainer position="top-right" autoClose={3000} />
