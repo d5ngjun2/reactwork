@@ -1,5 +1,13 @@
-import React from 'react';
 import styled from 'styled-components';
+import Slider from 'react-slick'; // react-slick 추가
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+
+import img1 from '../images/1.jpg';
+import img2 from '../images/2.jpg';
+import img3 from '../images/3.jpg';
+import img4 from '../images/4.jpg';
+import img5 from '../images/5.jpg';
 
 const MainContainer = styled.div`
   width: 100%;
@@ -11,13 +19,6 @@ const MainContainer = styled.div`
   align-items: center;
   padding: 3rem 1.5rem;
   box-sizing: border-box;
-`;
-
-const Title = styled.h1`
-  font-size: 2.5rem;
-  color: #2c3e50;
-  margin-bottom: 3rem;
-  font-weight: 700;
 `;
 
 const SectionWrapper = styled.div`
@@ -68,10 +69,54 @@ const Card = styled.div`
   }
 `;
 
+const SlideImageWrapper = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  height: 600px;
+  margin-top: 3rem;
+  margin-bottom: 5rem;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+`;
+
+const ImageSlide = styled(Slider)`
+  width: 100%;
+  height: 100%;
+`;
+
+const SlideImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* 이미지를 짤리지 않게 비율 맞추기 */
+  display: block;
+`;
+
 const Home = () => {
+  const images = [img1, img2, img3, img4, img5];
+
+  const settings = {
+    dots: true, // 하단에 점 표시
+    infinite: true, // 무한 반복
+    speed: 500, // 슬라이드 전환 속도
+    slidesToShow: 1, // 한 번에 보여줄 슬라이드 수
+    slidesToScroll: 1, // 한 번에 스크롤할 슬라이드 수
+    autoplay: true, // 자동 슬라이드
+    autoplaySpeed: 3000, // 자동 슬라이드 속도
+  };
+
   return (
     <MainContainer>
-      <Title>오늘의 축구 ⚽</Title>
+      <SlideImageWrapper>
+        <ImageSlide {...settings}>
+          {images.map((img, idx) => (
+            <div key={idx}>
+              <SlideImage src={img} alt={`Slide ${idx + 1}`} />
+            </div>
+          ))}
+        </ImageSlide>
+      </SlideImageWrapper>
 
       <SectionWrapper>
         <SectionTitle>📢 최신 뉴스</SectionTitle>

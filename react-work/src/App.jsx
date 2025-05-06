@@ -13,6 +13,8 @@ import EnrollBoard from './pages/EnrollBoard';
 import BoardDetail from './pages/BoardDetail';
 import NotFound from './pages/NotFound';
 import BoardEdit from './pages/BoardEdit';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 function App() {
   return (
