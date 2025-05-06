@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import axios from 'axios';
-import { NavLink } from 'react-router-dom';
 
 const useUserStore = create(
   persist(
