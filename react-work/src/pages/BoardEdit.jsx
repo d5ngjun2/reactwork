@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import useBoardStore from '../components/store/useBoardStore';
 import { toast } from 'react-toastify';
-import { ClipLoader } from 'react-spinners';
+import { FadeLoader } from 'react-spinners';
 
 const MainContainer = styled.div`
   width: 100%;
@@ -154,7 +154,7 @@ const BoardEdit = () => {
     return (
       <MainContainer>
         <LoaderContainer>
-          <ClipLoader color="#4a90e2" size={50} />
+          <FadeLoader color="#4a90e2" size={15} />
           <LoadingText>로딩중...</LoadingText>
         </LoaderContainer>
       </MainContainer>
