@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useUserStore from '../components/store/useUserStore'; // user 상태 관리
 import { CgProfile } from 'react-icons/cg';
-import { FaUser, FaIdBadge, FaEnvelope, FaBirthdayCake } from 'react-icons/fa';
+import { FaUser, FaIdBadge, FaEnvelope, FaBirthdayCake, FaLock } from 'react-icons/fa'; // FaLock 아이콘 추가
 import { toast } from 'react-toastify';
 
 const MyPageWrapper = styled.div`
@@ -153,29 +153,67 @@ const ButtonGroup = styled.div`
 const MyPage = () => {
   const { user, updateUser, deleteUser } = useUserStore(); // 상태에서 user와 logout 함수 불러오기
   const [form, setForm] = useState({
-    username: '', // 초기값을 빈 문자열로 설정
-    name: '',
+    userId: '',
+    userName: '', // userName으로 통일 (이전에 지적했던 부분)
     email: '',
     age: '',
+    // currentPassword: '', // 현재 비밀번호 확인 필드는 필요하다면 추가 (백엔드 로직에 따라)
+    newPassword: '', // 새 비밀번호
+    confirmPassword: '', // 새 비밀번호 확인
   });
+
   useEffect(() => {
     if (user) {
-      setForm({
-        username: user.username || '',
-        name: user.name || '',
+      setForm((prevForm) => ({
+        ...prevForm, // 기존 비밀번호 필드는 건드리지 않음
+        userId: user.userId || '',
+        userName: user.userName || '', // user.userName으로 설정 (백엔드 Response DTO의 userName 필드에 맞춤)
         email: user.email || '',
         age: user.age || '',
-      });
+      }));
     }
   }, [user]);
-  const handleSave = () => {
-    updateUser(form);
-    toast.success('회원수정이 정상적으로 되었습니다.');
-  };
+
   const handleChange = (ev) => {
     const { name, value } = ev.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
+
+  const handleSave = () => {
+    // 비밀번호 변경 로직 추가
+    if (form.newPassword && form.newPassword !== form.confirmPassword) {
+      toast.error('새 비밀번호와 비밀번호 확인이 일치하지 않습니다.');
+      return;
+    }
+    if (form.newPassword && form.newPassword.length < 4) {
+      // 최소 길이 제한
+      toast.error('비밀번호는 4자 이상이어야 합니다.');
+      return;
+    }
+
+    // 백엔드로 보낼 데이터 준비
+    const updateData = {
+      userId: form.userId, // 아이디는 변경 불가하므로 같이 보냄
+      userName: form.userName,
+      email: form.email,
+      age: form.age,
+    };
+
+    // 새 비밀번호가 입력된 경우에만 추가
+    if (form.newPassword) {
+      updateData.password = form.newPassword; // 백엔드 DTO에 password 필드가 있을 경우
+    }
+
+    updateUser(updateData); // 수정된 데이터(비밀번호 포함 가능)를 전달
+    toast.success('회원수정이 정상적으로 되었습니다.');
+    // 비밀번호 입력 필드 초기화 (보안상 좋음)
+    setForm((prev) => ({
+      ...prev,
+      newPassword: '',
+      confirmPassword: '',
+    }));
+  };
+
   const handleDelete = () => {
     if (window.confirm('정말 삭제하시겠습니까?')) {
       deleteUser(); // form 전달할 필요 없음
@@ -202,10 +240,11 @@ const MyPage = () => {
             </IconWrapper>
             <StyledInput
               type="text"
-              name="username"
-              value={form.username}
+              name="userId"
+              value={form.userId}
               onChange={handleChange}
               placeholder="아이디"
+              readOnly
             />
           </InputGroup>
 
@@ -213,7 +252,13 @@ const MyPage = () => {
             <IconWrapper>
               <FaIdBadge />
             </IconWrapper>
-            <StyledInput type="text" name="name" value={form.name} onChange={handleChange} placeholder="닉네임" />
+            <StyledInput
+              type="text"
+              name="userName" // userName으로 변경
+              value={form.userName}
+              onChange={handleChange}
+              placeholder="닉네임"
+            />
           </InputGroup>
 
           <InputGroup>
@@ -228,6 +273,36 @@ const MyPage = () => {
               <FaBirthdayCake />
             </IconWrapper>
             <StyledInput type="number" name="age" value={form.age} onChange={handleChange} placeholder="나이" />
+          </InputGroup>
+
+          {/* 새 비밀번호 입력 필드 추가 */}
+          <InputGroup>
+            <IconWrapper>
+              <FaLock />
+            </IconWrapper>
+            <StyledInput
+              type="password"
+              name="newPassword"
+              value={form.newPassword}
+              onChange={handleChange}
+              placeholder="새 비밀번호 (변경 시 입력)"
+              autoComplete="new-password" // 브라우저 자동 완성 기능 도움
+            />
+          </InputGroup>
+
+          {/* 새 비밀번호 확인 입력 필드 추가 */}
+          <InputGroup>
+            <IconWrapper>
+              <FaLock />
+            </IconWrapper>
+            <StyledInput
+              type="password"
+              name="confirmPassword"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              placeholder="새 비밀번호 확인"
+              autoComplete="new-password"
+            />
           </InputGroup>
         </ProfileDetails>
         <ButtonGroup>

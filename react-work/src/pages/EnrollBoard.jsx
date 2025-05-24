@@ -150,27 +150,48 @@ const BackButton = styled.button`
 
 const EnrollBoard = () => {
   const sysdate = new Date().toISOString().split('T')[0];
-  const user = useUserStore((loginUser) => loginUser.user);
+  const user = useUserStore((state) => state.user);
   const navigate = useNavigate();
 
   const { register, handleSubmit } = useForm();
   const { addBoard } = useBoardStore();
 
   const onSubmit = async (formData) => {
-    const file = formData.file?.[0]?.name || '';
-    const data = {
-      ...formData,
-      file,
+    if (!user || !user.userName) {
+      toast.error('로그인 정보가 유효하지 않습니다. 다시 로그인해주세요.');
+      navigate('/login');
+      return;
+    }
+    const boardFormData = new FormData();
+    const boardTextData = {
+      title: formData.title,
+      content: formData.content,
+      writer: user.userName,
       date: sysdate,
-      writer: user.name,
     };
+    console.log('프론트에서 전송될 boardTextData:', boardTextData);
+    console.log('프론트에서 전송될 JSON 문자열:', JSON.stringify(boardTextData));
+    boardFormData.append(
+      'boardData',
+      new Blob([JSON.stringify(boardTextData)], {
+        type: 'application/json',
+      })
+    );
+
+    const selectedFile = formData.file?.[0]; // useForm에서 파일 객체를 직접 가져옴
+    if (selectedFile) {
+      boardFormData.append('file', selectedFile);
+    }
+
     try {
-      await addBoard(data);
-      console.log('게시글 입력 성공!', data);
+      // 이제 addBoard 함수에 FormData 객체를 전달
+      await addBoard(boardFormData);
+      console.log('게시글 입력 성공!');
       toast.success('게시글이 작성되었습니다.');
       navigate('/board');
     } catch (err) {
-      console.log('등록 실패 : ', err);
+      console.error('등록 실패 : ', err);
+      toast.error('게시글 등록에 실패했습니다.'); // 사용자에게 실패 알림
     }
   };
 
@@ -178,7 +199,6 @@ const EnrollBoard = () => {
     <MainContainer>
       <EnrollForm onSubmit={handleSubmit(onSubmit)}>
         <h2>게시글 작성</h2>
-
         <FormGroup>
           <Label>제목</Label>
           <InputTitle type="text" placeholder="제목을 입력하세요." {...register('title')} />
@@ -186,12 +206,12 @@ const EnrollBoard = () => {
 
         <FormGroup>
           <Label>날짜</Label>
-          <InputTitle type="text" value={sysdate} readOnly {...register('sysdate')} />
+          <InputTitle type="text" value={sysdate} readOnly />
         </FormGroup>
 
         <FormGroup>
           <Label>작성자</Label>
-          <InputTitle type="text" value={user.name} readOnly {...register('writer')} />
+          <InputTitle type="text" value={user.name} readOnly />
         </FormGroup>
 
         <FormGroup>

@@ -140,17 +140,17 @@ const Login = () => {
   // 로그인
   const onSubmit = async (data) => {
     try {
-      const response = await axios.get(
-        `http://localhost:3001/users?username=${data.username}&password=${data.password}`
+      const response = await axios.post(
+        `http://localhost:8888/api/members/login`, // 스프링 로그인 API 경로
+        { userId: data.username, password: data.password } // 스프링 DTO 필드명에 맞게 변경
       );
-
+      const userData = response.data; // 유효한 사용자 정보
       // 서버에서 받은 데이터가 없거나 빈 배열이라면 로그인 실패
       if (response.data.length === 0) {
         toast.error('아이디 또는 비밀번호가 잘못되었습니다.');
         return;
       }
 
-      const userData = response.data[0]; // 유효한 사용자 정보
       console.log('로그인 성공 ! ', userData); // 서버로부터 응답 데이터 출력
       toast.success('로그인 성공!');
 
@@ -159,8 +159,8 @@ const Login = () => {
 
       navigate('/');
     } catch (error) {
-      console.error('로그인 요청 중 오류 발생:', error);
-      toast.error('로그인 요청 중 오류가 발생했습니다.');
+      console.error('아이디 또는 비밀번호가 잘못되었습니다.', error);
+      toast.error('아이디 또는 비밀번호가 잘못되었습니다.');
     }
   };
 

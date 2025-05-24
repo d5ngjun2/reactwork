@@ -81,14 +81,14 @@ const Board = () => {
   // 로그인 정보만 가져오기
   const user = useUserStore((loginUser) => loginUser.user);
 
-  const boardList = useBoardStore((board) => board.boards);
+  const boardList = useBoardStore((state) => state.boards);
   const allBoards = useBoardStore((state) => state.SelectAllBoards);
   const navigate = useNavigate();
 
   // 마운트시 게시글 전부 가져오기
   useEffect(() => {
     allBoards();
-  }, []);
+  }, [allBoards]);
 
   const ClickBoard = (boardId) => {
     navigate(`/BoardDetail/${boardId}`);
@@ -100,20 +100,20 @@ const Board = () => {
         <Card>
           <thead>
             <tr>
-              <td>게시글 번호</td>
-              <td>작성자</td>
-              <td>제목</td>
-              <td>날짜</td>
-              <td>조회수</td>
+              <th>게시글 번호</th>
+              <th>작성자</th>
+              <th>제목</th>
+              <th>날짜</th>
+              <th>조회수</th>
             </tr>
           </thead>
           <tbody>
-            {boardList.map((board, index) => (
-              <tr key={index} onClick={() => ClickBoard(board.id)}>
-                <td>{index + 1}</td>
-                <td>{board.writer}</td>
-                <td>{board.title}</td>
-                <td>{board.date}</td>
+            {boardList.map((board) => (
+              <tr key={board.boardNo} onClick={() => ClickBoard(board.boardNo)}>
+                <td>{board.boardNo}</td> {/* 이렇게 한 줄로 붙여 쓰고 */}
+                <td>{board.writerName}</td>
+                <td>{board.boardTitle}</td>
+                <td>{new Date(board.enrollDate).toLocaleDateString()}</td>
                 <td>{board.views ?? 0}</td>
               </tr>
             ))}

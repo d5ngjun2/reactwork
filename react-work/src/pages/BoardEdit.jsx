@@ -103,50 +103,76 @@ const LoadingText = styled.p`
 `;
 
 const BoardEdit = () => {
-  const { boardId } = useParams(); // URL에서 boardId를 가져옴
+  const { boardId } = useParams();
+  // boardId를 숫자로 변환하여 사용합니다.
+  const boardNo = Number(boardId);
+
   const boards = useBoardStore((state) => state.boards);
-  const { updateBoard, SelectAllBoards } = useBoardStore();
+  const { updateBoard, fetchBoardById } = useBoardStore(); // SelectAllBoards 대신 fetchBoardById 사용 권장
   const navigate = useNavigate();
 
   const [editTitle, setEditTitle] = useState('');
   const [editContent, setEditContent] = useState('');
-  const [isLoading, setIsLoading] = useState(true); // 로딩 상태를 관리
+  const [isLoading, setIsLoading] = useState(true);
+  const [boardDetails, setBoardDetails] = useState(null); // 특정 게시글 상세 정보를 저장할 상태
 
-  // 게시글을 찾고, 없다면 로딩 상태로 처리
-  const board = boards.find((board) => board.id === boardId);
-
+  // 게시글 상세 정보 로드
   useEffect(() => {
-    SelectAllBoards(); // 게시글 목록 로드
+    const loadBoardDetails = async () => {
+      setIsLoading(true);
+      try {
+        // 캐시된 boards에서 먼저 찾고, 없으면 API 호출
+        const cachedBoard = boards.find((b) => b.boardNo === boardNo);
+        if (cachedBoard) {
+          setBoardDetails(cachedBoard);
+          setEditTitle(cachedBoard.boardTitle);
+          setEditContent(cachedBoard.boardContent);
+        } else {
+          // 캐시에 없으면 서버에서 직접 가져옵니다.
+          const fetchedBoard = await fetchBoardById(boardNo);
+          setBoardDetails(fetchedBoard);
+          setEditTitle(fetchedBoard.boardTitle);
+          setEditContent(fetchedBoard.boardContent);
+        }
+      } catch (error) {
+        console.error('게시글 상세 정보 가져오기 실패:', error);
+        toast.error('게시글 정보를 불러오는 데 실패했습니다.');
+        navigate('/board', { replace: true }); // 오류 시 목록 페이지로 리다이렉트
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    const timeout = setTimeout(() => {
+    if (boardNo) {
+      // boardNo가 유효할 때만 실행
+      loadBoardDetails();
+    } else {
+      // boardNo가 유효하지 않으면 로딩 상태 해제 및 에러 메시지
       setIsLoading(false);
-    }, 1000); //
-
-    return () => clearTimeout(timeout); // cleanup: 컴포넌트 언마운트 시 타이머 해제
-  }, []);
-
-  // board가 로드되면 수정 데이터를 세팅
-  useEffect(() => {
-    const currentBoard = boards.find((b) => b.id === boardId);
-    if (currentBoard) {
-      setEditTitle(currentBoard.title);
-      setEditContent(currentBoard.content);
+      toast.error('유효하지 않은 게시글 번호입니다.');
+      navigate('/board', { replace: true });
     }
-  }, [boards, boardId]);
+  }, [boardNo, boards, fetchBoardById, navigate]); // 의존성 배열에 필요한 값 추가
 
   const handleSave = async () => {
-    if (!board) {
+    if (!boardDetails) {
+      // board 대신 boardDetails 사용
       toast.error('게시글을 찾을 수 없습니다.');
       return;
     }
 
     try {
-      await updateBoard(board.id, { title: editTitle, content: editContent });
+      // updateBoard 함수에 게시글 번호와 수정할 데이터를 전달
+      await updateBoard(boardDetails.boardNo, {
+        // board.id 대신 boardDetails.boardNo
+        boardTitle: editTitle, // title 대신 boardTitle
+        boardContent: editContent, // content 대신 boardContent
+      });
       toast.success('게시글이 수정되었습니다.');
-      navigate(`/BoardDetail/${board.id}`); //
+      navigate(`/BoardDetail/${boardDetails.boardNo}`); // board.id 대신 boardDetails.boardNo
     } catch (err) {
       toast.error('게시글 수정에 실패했습니다.');
-      console.log('게시글 수정에 실패했습니다.', err);
+      console.error('게시글 수정에 실패했습니다.', err); // console.log 대신 console.error
     }
   };
 
@@ -161,8 +187,14 @@ const BoardEdit = () => {
     );
   }
 
-  if (!board) {
-    return <div>게시글을 찾을 수 없습니다.</div>;
+  // boardDetails가 null이면 (찾지 못했거나 오류) 메시지 표시
+  if (!boardDetails) {
+    return (
+      <MainContainer>
+        <div>게시글을 찾을 수 없거나 로드에 실패했습니다.</div>
+        <button onClick={() => navigate('/board')}>목록으로 돌아가기</button>
+      </MainContainer>
+    );
   }
 
   return (
@@ -180,7 +212,9 @@ const BoardEdit = () => {
         <button type="button" onClick={handleSave}>
           저장
         </button>
-        <button type="button" onClick={() => navigate(`/BoardDetail/${board.id}`)}>
+        <button type="button" onClick={() => navigate(`/BoardDetail/${boardDetails.boardNo}`)}>
+          {' '}
+          {/* board.id 대신 boardDetails.boardNo */}
           취소
         </button>
       </EditForm>

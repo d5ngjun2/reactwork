@@ -5,7 +5,6 @@ import useBoardStore from '../components/store/useBoardStore';
 import useUserStore from '../components/store/useUserStore';
 import { toast } from 'react-toastify';
 
-// Styled components
 const MainContainer = styled.div`
   width: 100%;
   min-height: 100vh;
@@ -127,40 +126,58 @@ const DeleteButton = styled(ActionButton)`
 
 const BoardDetail = () => {
   const { boardId } = useParams();
+  const boardNo = Number(boardId);
+
   const user = useUserStore((state) => state.user);
   const boards = useBoardStore((state) => state.boards);
-  const { deleteBoard, updateBoard } = useBoardStore();
+  const { deleteBoard, updateBoard, fetchBoardById } = useBoardStore();
+
   const [boardDetails, setBoardDetails] = useState(null);
   const navigate = useNavigate();
-  const hasIncreasedView = useRef(false); // 조회수 중복 증가 방지
+  const hasIncreasedView = useRef(false);
 
-  // 게시글 불러오기
   useEffect(() => {
-    const currentBoard = boards.find((board) => board.id === boardId);
-    if (currentBoard) {
-      setBoardDetails(currentBoard);
+    const loadBoardDetails = async () => {
+      const cachedBoard = boards.find((board) => board.boardNo === boardNo);
+
+      if (cachedBoard) {
+        setBoardDetails(cachedBoard);
+      } else {
+        try {
+          const fetchedBoard = await fetchBoardById(boardNo);
+          setBoardDetails(fetchedBoard);
+        } catch (error) {
+          console.error('게시글 상세 정보 가져오기 실패:', error);
+          toast.error('게시글을 불러오는 데 실패했습니다.');
+          navigate('/board', { replace: true });
+        }
+      }
+    };
+
+    if (boardNo) {
+      loadBoardDetails();
     }
-  }, [boards, boardId]);
+  }, [boardNo, boards, fetchBoardById, navigate]);
 
-  // 조회수 증가
   useEffect(() => {
-    if (boardDetails && !hasIncreasedView.current) {
-      hasIncreasedView.current = true;
-      updateBoard(boardDetails.id, {
+    if (boardDetails && !hasIncreasedView.current && user?.userName !== boardDetails.writerName) {
+      updateBoard(boardDetails.boardNo, {
         views: (boardDetails.views || 0) + 1,
       });
+      hasIncreasedView.current = true;
       setBoardDetails((prev) => ({
         ...prev,
         views: (prev.views || 0) + 1,
       }));
     }
-  }, [boardDetails, updateBoard]);
+  }, [boardDetails, updateBoard, user?.userName]);
 
-  // 삭제 처리
   const handleDelete = async () => {
+    if (!boardDetails) return;
+
     if (window.confirm('정말 삭제하시겠습니까?')) {
       try {
-        await deleteBoard(boardDetails.id);
+        await deleteBoard(boardDetails.boardNo);
         toast.success('게시글이 삭제되었습니다.');
         navigate('/board', { replace: true });
       } catch (error) {
@@ -170,7 +187,9 @@ const BoardDetail = () => {
     }
   };
 
-  if (!boardDetails) return <div>게시글을 찾을 수 없습니다.</div>;
+  if (!boardDetails) {
+    return <div>게시글을 로드 중이거나 찾을 수 없습니다...</div>;
+  }
 
   return (
     <MainContainer>
@@ -179,31 +198,35 @@ const BoardDetail = () => {
 
         <FormGroup>
           <Label>제목</Label>
-          <InputTitle type="text" value={boardDetails.title} readOnly />
+          <InputTitle type="text" value={boardDetails.boardTitle || ''} readOnly />
         </FormGroup>
 
         <FormGroup>
           <Label>날짜</Label>
-          <InputTitle type="text" value={boardDetails.date} readOnly />
+          <InputTitle
+            type="text"
+            value={boardDetails.enrollDate ? new Date(boardDetails.enrollDate).toLocaleDateString() : ''}
+            readOnly
+          />
         </FormGroup>
 
         <FormGroup>
           <Label>작성자</Label>
-          <InputTitle type="text" value={boardDetails.writer} readOnly />
+          <InputTitle type="text" value={boardDetails.writerName || ''} readOnly />
         </FormGroup>
 
         <FormGroup>
           <Label>내용</Label>
-          <TextArea value={boardDetails.content} readOnly />
+          <TextArea value={boardDetails.boardContent || ''} readOnly />
         </FormGroup>
 
         <ButtonGroup>
           <ActionButton type="button" onClick={() => navigate('/board')}>
             돌아가기
           </ActionButton>
-          {user?.name === boardDetails.writer && (
+          {user?.userName === boardDetails.writerName && (
             <>
-              <ActionButton onClick={() => navigate(`/boardedit/${boardDetails.id}`)}>수정</ActionButton>
+              <ActionButton onClick={() => navigate(`/boardedit/${boardDetails.boardNo}`)}>수정</ActionButton>
               <DeleteButton type="button" onClick={handleDelete}>
                 삭제
               </DeleteButton>
