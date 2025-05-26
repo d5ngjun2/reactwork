@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
-import useBoardStore from '../components/store/useBoardStore';
+import useBoardStore from '../components/store/useBoardStore'; // useBoardStore 임포트
 import useUserStore from '../components/store/useUserStore';
 import { toast } from 'react-toastify';
 
@@ -130,47 +130,64 @@ const BoardDetail = () => {
 
   const user = useUserStore((state) => state.user);
   const boards = useBoardStore((state) => state.boards);
-  const { deleteBoard, updateBoard, fetchBoardById } = useBoardStore();
+  // ✨ useBoardStore에서 increaseViewCount 액션을 가져옵니다. ✨
+  const { deleteBoard, fetchBoardById, increaseViewCount } = useBoardStore();
 
   const [boardDetails, setBoardDetails] = useState(null);
   const navigate = useNavigate();
-  const hasIncreasedView = useRef(false);
+  const hasIncreasedView = useRef(false); // 페이지 진입 시 한 번만 조회수 증가를 위한 플래그
 
+  // 게시글 상세 정보 로드 및 조회수 증가 로직을 처리하는 useEffect
   useEffect(() => {
     const loadBoardDetails = async () => {
       const cachedBoard = boards.find((board) => board.boardNo === boardNo);
 
-      if (cachedBoard) {
-        setBoardDetails(cachedBoard);
-      } else {
-        try {
+      try {
+        let currentBoard;
+        if (cachedBoard) {
+          currentBoard = cachedBoard;
+          setBoardDetails(cachedBoard);
+        } else {
+          // 캐시에 없으면 백엔드에서 가져오기
           const fetchedBoard = await fetchBoardById(boardNo);
+          currentBoard = fetchedBoard;
           setBoardDetails(fetchedBoard);
-        } catch (error) {
-          console.error('게시글 상세 정보 가져오기 실패:', error);
-          toast.error('게시글을 불러오는 데 실패했습니다.');
-          navigate('/board', { replace: true });
         }
+
+        // ✨✨✨ 여기에 디버깅용 console.log 추가 ✨✨✨
+        console.log('--- 조회수 증가 조건 확인 시작 ---');
+        console.log('currentBoard 존재:', !!currentBoard); // currentBoard가 null/undefined인지 확인
+        console.log('hasIncreasedView.current:', hasIncreasedView.current); // useRef 값 확인
+        console.log('user?.userName:', user?.userName); // 로그인 사용자 이름
+        console.log('boardDetails.writerName (게시글 작성자):', currentBoard?.writerName); // 게시글 작성자 이름
+        console.log(
+          '작성자 불일치 여부 (user?.userName !== currentBoard?.writerName):',
+          user?.userName !== currentBoard?.writerName
+        );
+        console.log('--- 조회수 증가 조건 확인 끝 ---');
+
+        // ✨ 게시글이 로드되었고, 아직 조회수를 증가시키지 않았으며, 게시글 작성자가 아닐 때
+        if (currentBoard && !hasIncreasedView.current && user?.userName !== currentBoard.writerName) {
+          await increaseViewCount(boardNo); // 백엔드에 조회수 증가 요청
+          hasIncreasedView.current = true; // 요청 보냈음을 표시
+
+          // 프론트엔드 상태 업데이트: 백엔드 API가 성공했으므로 로컬 상태도 업데이트하여 즉시 반영
+          setBoardDetails((prev) => ({
+            ...prev,
+            views: (prev.views || 0) + 1,
+          }));
+        }
+      } catch (error) {
+        console.error('게시글 상세 정보 가져오기 또는 조회수 증가 실패:', error);
+        toast.error('게시글을 불러오거나 조회수를 업데이트하는 데 실패했습니다.');
+        navigate('/board', { replace: true });
       }
     };
 
     if (boardNo) {
       loadBoardDetails();
     }
-  }, [boardNo, boards, fetchBoardById, navigate]);
-
-  useEffect(() => {
-    if (boardDetails && !hasIncreasedView.current && user?.userName !== boardDetails.writerName) {
-      updateBoard(boardDetails.boardNo, {
-        views: (boardDetails.views || 0) + 1,
-      });
-      hasIncreasedView.current = true;
-      setBoardDetails((prev) => ({
-        ...prev,
-        views: (prev.views || 0) + 1,
-      }));
-    }
-  }, [boardDetails, updateBoard, user?.userName]);
+  }, [boardNo, boards, fetchBoardById, navigate, user?.userName, increaseViewCount]); // increaseViewCount를 의존성 배열에 추가
 
   const handleDelete = async () => {
     if (!boardDetails) return;

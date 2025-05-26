@@ -211,7 +211,7 @@ const EnrollBoard = () => {
 
         <FormGroup>
           <Label>작성자</Label>
-          <InputTitle type="text" value={user.name} readOnly />
+          <InputTitle type="text" value={user.userName} readOnly />
         </FormGroup>
 
         <FormGroup>

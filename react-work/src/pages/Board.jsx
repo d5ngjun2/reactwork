@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import useBoardStore from '../components/store/useBoardStore';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const MainContainer = styled.div`
   width: 100%;
@@ -84,11 +85,12 @@ const Board = () => {
   const boardList = useBoardStore((state) => state.boards);
   const allBoards = useBoardStore((state) => state.SelectAllBoards);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // 마운트시 게시글 전부 가져오기
   useEffect(() => {
     allBoards();
-  }, [allBoards]);
+  }, [location.pathname]);
 
   const ClickBoard = (boardId) => {
     navigate(`/BoardDetail/${boardId}`);

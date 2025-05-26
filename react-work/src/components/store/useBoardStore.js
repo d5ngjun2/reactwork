@@ -39,7 +39,7 @@ const useBoardStore = create((set, get) => ({
 
   // 게시글 하나 가져오기 (이 함수는 현재 상태에서만 찾으므로 백엔드 요청이 필요 없음)
   getBoardById: (id) => {
-    return (get().boards || []).find((b) => b.id === id);
+    return (get().boards || []).find((b) => b.boardNo === id);
   },
 
   // (선택 사항) 서버에서 게시글 하나를 직접 가져오는 함수 (필요하다면)
@@ -59,7 +59,7 @@ const useBoardStore = create((set, get) => ({
       // API_BASE_URL을 사용하여 요청 URL을 구성
       const response = await axios.patch(`${API_BASE_URL}/api/board/${id}`, updatedData); // ⭐ 수정: API_BASE_URL 사용
       set((state) => ({
-        boards: state.boards.map((b) => (b.id === id ? response.data : b)),
+        boards: state.boards.map((b) => (b.boardNo === id ? response.data : b)),
       }));
     } catch (err) {
       console.error('게시글 수정 실패:', err);
@@ -73,12 +73,25 @@ const useBoardStore = create((set, get) => ({
       await axios.delete(`${API_BASE_URL}/api/board/${id}`); // ⭐ 수정: API_BASE_URL 사용
       // 삭제 후 boards 상태에서도 해당 게시글 제거
       set((state) => ({
-        boards: state.boards.filter((b) => b.id !== id),
+        boards: state.boards.filter((b) => b.boardNo !== id),
       }));
       return true;
     } catch (err) {
       console.error('게시글 삭제 실패:', err);
       throw err; // 에러를 다시 던져서 호출하는 쪽에서 처리할 수 있도록
+    }
+  },
+
+  // ✨ 새로 추가할 조회수 증가 액션 ✨
+  increaseViewCount: async (boardNo) => {
+    try {
+      // ✨ 백엔드 컨트롤러의 최종 매핑 경로와 정확히 일치시켜야 합니다. ✨
+      // 백엔드 @RequestMapping("/api/boards") + @PatchMapping("/{id}/views") 라면
+      await axios.patch(`${API_BASE_URL}/api/board/${boardNo}/views`);
+      console.log(`게시글 ${boardNo} 조회수 증가 API 호출 성공`);
+      // ... (Zustand 상태 업데이트 로직) ...
+    } catch (error) {
+      console.error(`게시글 ${boardNo} 조회수 증가 실패:`, error);
     }
   },
 }));
